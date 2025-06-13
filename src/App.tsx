@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import type { DragEvent } from "react";
 import peregrineLogo from "./assets/peregrine.png";
 import "./App.css";
 import type { ImageMeta } from "./@types/ImageMeta";
@@ -22,6 +23,7 @@ function App() {
   const [images, setImages] = useState<ImageMeta[]>([]);
   const [search, setSearch] = useState("");
   const [selectedImage, setSelectedImage] = useState<ImageMeta | null>(null);
+  const [showDropzoneOverlay, setShowDropzoneOverlay] = useState(false);
 
   async function fetchImages(search: string = "") {
     const result = await SearchFactory.getInstance()
@@ -34,6 +36,35 @@ function App() {
   useEffect(() => {
     fetchImages(search);
   }, [search]);
+
+  useEffect(() => {
+    let dragCounter = 0;
+    const handleDragEnter = (e: Event) => {
+      const event = e as unknown as DragEvent;
+      dragCounter++;
+      if (event.dataTransfer && Array.from(event.dataTransfer.types).includes("Files")) {
+        setShowDropzoneOverlay(true);
+      }
+    };
+    const handleDragLeave = () => {
+      dragCounter--;
+      if (dragCounter <= 0) {
+        setShowDropzoneOverlay(false);
+      }
+    };
+    const handleDrop = () => {
+      dragCounter = 0;
+      setShowDropzoneOverlay(false);
+    };
+    window.addEventListener("dragenter", handleDragEnter);
+    window.addEventListener("dragleave", handleDragLeave);
+    window.addEventListener("drop", handleDrop);
+    return () => {
+      window.removeEventListener("dragenter", handleDragEnter);
+      window.removeEventListener("dragleave", handleDragLeave);
+      window.removeEventListener("drop", handleDrop);
+    };
+  }, []);
 
   return (
     <>
@@ -59,8 +90,9 @@ function App() {
           />
         </header>
         <main className="min-h-screen pb-20">
-          <div className="container mx-auto">
-            <div className="mb-8 flex justify-center">
+          {/* Dropzone overlay spanning the entire screen */}
+          {showDropzoneOverlay && (
+            <div className="fixed inset-0 z-20 flex items-center justify-center pointer-events-none">
               <Dropzone
                 onDrop={async (acceptedFiles: File[]) => {
                   await Promise.all(
@@ -77,24 +109,23 @@ function App() {
                   await fetchImages(search);
                 }}
               >
-                {(dropzone: DropzoneState) => (
-                  <>
-                    {dropzone.isDragAccept ? (
-                      <div className="rounded-xl border-2 border-dashed border-peregrine-primary bg-white/70 hover:bg-peregrine-highlight/20 transition-all p-8 w-full max-w-2xl shadow-md flex items-center gap-2">
-                        <UploadIcon className="w-5 h-5" />
-                        Yup, just like this. Now drop the files.
-                      </div>
-                    ) : (
-                      <div className="rounded-xl border-2 border-dashed border-peregrine-primary bg-white/70 hover:bg-peregrine-highlight/20 transition-all p-8 w-full max-w-2xl shadow-md flex items-center gap-2">
-                        <UploadIcon className="w-5 h-5" />
-                        Drop files to upload
-                      </div>
-                    )}
-                  </>
+                {() => (
+                  <div
+                    className="transition-opacity duration-200 fixed inset-0 flex items-center justify-center bg-white/80 border-2 border-dashed border-peregrine-primary pointer-events-auto opacity-100"
+                    style={{ zIndex: 30 }}
+                  >
+                    <div className="flex items-center gap-2 text-peregrine-primary-dark text-xl">
+                      <UploadIcon className="w-8 h-8" />
+                        Drop files to upload.
+                    </div>
+                  </div>
                 )}
               </Dropzone>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+          )}
+          {/* End Dropzone overlay */}
+          <div className="container mx-auto">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8">
               {images.map((image) => (
                 <Image
                   key={image.id}
