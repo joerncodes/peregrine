@@ -10,6 +10,7 @@ dotenv.config();
 const app = express();
 const port = 3001;
 app.use(cors());
+app.use(express.json());
 import fs from "fs";
 
 const storage = multer.diskStorage({
@@ -41,7 +42,6 @@ app.post("/upload", upload.single("image"), (req, res) => {
     id,
     title,
     description: "",
-    tags: [],
     filePath: "/images/" + req.file.filename,
     createdAt: new Date().toISOString(),
   };
@@ -66,12 +66,37 @@ app.post("/upload", upload.single("image"), (req, res) => {
     });
 });
 
+app.delete('/image/:id', (req, res) => {
+  const { id } = req.params;
+  const meilisearch = new Meilisearch({
+    host: "http://localhost:7700",
+    apiKey: process.env.VITE_MEILI_MASTER_KEY,
+  });
+  meilisearch.index("images").deleteDocument(id);
+  res.json({ message: "Image deleted" });
+});
+app.patch('/image/:id', (req, res) => {
+  const { id } = req.params;
+  const { title, description, tags } = req.body;
+  const meilisearch = new Meilisearch({
+    host: "http://localhost:7700",
+    apiKey: process.env.VITE_MEILI_MASTER_KEY,
+  });
+  meilisearch.index("images").updateDocuments([{
+    id,
+    title,
+    description,
+    tags,
+  }]);
+  res.json({ message: "Image updated" });
+});
+
 app.get('/reset', (req, res) => {
   const meilisearch = new Meilisearch({
     host: "http://localhost:7700",
     apiKey: process.env.VITE_MEILI_MASTER_KEY,
   });
-  meilisearch.index("images").deleteAllDocuments();
+  meilisearch.index("images").delete();
   // Delete all images from /public/images
   const imagesDir = path.join(process.cwd(), 'public/images');
   fs.readdir(imagesDir, (err, files) => {
@@ -96,15 +121,29 @@ app.get("/search", async (req, res) => {
     host: "http://localhost:7700",
     apiKey: process.env.VITE_MEILI_MASTER_KEY,
   });
-  try {
-    const result = await meilisearch.index("images").search(q, {
+  async function doSearch() {
+    return await meilisearch.index("images").search(q, {
       limit: 1000,
-      sort: ["createdAt:desc"]
+      sort: ["createdAt:desc"],
     });
+  }
+  try {
+    const result = await doSearch();
     res.json(result.hits);
   } catch (err) {
-    console.error("Search failed:", err);
-    res.status(500).json({ error: "Search failed" });
+    console.error("Search failed, attempting to create index and set sortable attributes:", err);
+    try {
+      // Create the index if it doesn't exist
+      await meilisearch.createIndex("images");
+      // Set 'createdAt' as a sortable attribute
+      await meilisearch.index("images").updateSortableAttributes(["createdAt"]);
+      // Retry the search
+      const result = await doSearch();
+      res.json(result.hits);
+    } catch (err2) {
+      console.error("Search still failed after attempting to fix index:", err2);
+      res.status(500).json({ error: "Search failed and could not fix index." });
+    }
   }
 });
 

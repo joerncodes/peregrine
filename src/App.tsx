@@ -6,22 +6,10 @@ import type { ImageMeta } from "./@types/ImageMeta";
 import { Input } from "./components/ui/input";
 import Image from "./components/Image";
 import Dropzone from "shadcn-dropzone";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-} from "./components/ui/sheet";
-import { Button } from "./components/ui/button";
-import {
-  ClipboardIcon,
-  DownloadIcon,
-  InfoIcon,
-  UploadIcon,
-  ZoomInIcon,
-} from "lucide-react";
 import { Toaster } from "./components/ui/sonner";
 import { toast } from "sonner";
+import ImageSheet from "./components/ImageSheet";
+import { InfoIcon, UploadIcon } from "lucide-react";
 
 function App() {
   const [loaded, setLoaded] = useState(false);
@@ -179,119 +167,17 @@ function App() {
           </div>
         </main>
 
-        <Sheet
+        <ImageSheet
+          image={selectedImage}
           open={!!selectedImage}
-          onOpenChange={() => setSelectedImage(null)}
-        >
-          <SheetContent className="p-8 max-w-lg mx-auto bg-white/95 rounded-l-2xl shadow-2xl border-0">
-            <SheetHeader>
-              <SheetTitle className="text-3xl font-bold text-peregrine-primary mb-2">
-                {selectedImage?.title}
-              </SheetTitle>
-            </SheetHeader>
-            {selectedImage && (
-              <div className="mt-4 space-y-6">
-                <img
-                  src={selectedImage.filePath}
-                  alt={selectedImage.title}
-                  className="w-full rounded-xl shadow-lg border border-peregrine-highlight"
-                />
-                <div className="flex gap-4 justify-center">
-                  <Button
-                    variant="secondary"
-                    size="icon"
-                    title="Zoom"
-                    className="hover:bg-peregrine-highlight/40"
-                    onClick={() =>
-                      selectedImage &&
-                      window.open(selectedImage.filePath, "_blank")
-                    }
-                    disabled={uploading}
-                  >
-                    <ZoomInIcon className="w-5 h-5" />
-                  </Button>
-                  <Button
-                    variant="secondary"
-                    size="icon"
-                    title="Download"
-                    className="hover:bg-peregrine-highlight/40"
-                    onClick={() => {
-                      const a = document.createElement("a");
-                      a.href = selectedImage.filePath;
-                      a.download = selectedImage.title;
-                      a.click();
-                    }}
-                    disabled={uploading}
-                  >
-                    <DownloadIcon className="w-5 h-5" />
-                  </Button>
-                  <Button
-                    variant="secondary"
-                    size="icon"
-                    title="Copy to clipboard"
-                    className="hover:bg-peregrine-highlight/40"
-                    onClick={async () => {
-                      try {
-                        const img = new window.Image();
-                        img.crossOrigin = "anonymous";
-                        img.src = selectedImage.filePath;
-
-                        img.onload = async () => {
-                          const canvas = document.createElement("canvas");
-                          canvas.width = img.width;
-                          canvas.height = img.height;
-                          const ctx = canvas.getContext("2d");
-                          ctx?.drawImage(img, 0, 0);
-
-                          canvas.toBlob(async (blob) => {
-                            if (blob) {
-                              try {
-                                await navigator.clipboard.write([
-                                  new window.ClipboardItem({
-                                    "image/png": blob,
-                                  }),
-                                ]);
-                                toast.success("Image copied to clipboard");
-                                setSelectedImage(null);
-                              } catch (err) {
-                                toast.error("Failed to copy image. :(");
-                                console.error("Failed to copy image:", err);
-                              }
-                            }
-                          }, "image/png");
-                        };
-
-                        img.onerror = () => {
-                          console.error("Failed to load image for copying.");
-                        };
-                      } catch (err) {
-                        console.error("Failed to copy image:", err);
-                      }
-                    }}
-                    disabled={uploading}
-                  >
-                    <ClipboardIcon className="w-5 h-5" />
-                  </Button>
-                </div>
-                <div className="space-y-2">
-                  <p className="text-base text-gray-600 italic">
-                    {selectedImage.description}
-                  </p>
-                  <div className="flex flex-wrap gap-2">
-                    {selectedImage.tags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="px-3 py-1 bg-peregrine-highlight/40 text-peregrine-primary-dark rounded-full text-sm font-medium shadow-sm border border-peregrine-primary/20"
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
-          </SheetContent>
-        </Sheet>
+          onOpenChange={(open) => setSelectedImage(open ? selectedImage : null)}
+          uploading={uploading}
+          onUpdate={() => {
+            setTimeout(() => {
+              fetchImages(search);
+            }, 300);
+          }}
+        />
         <Toaster />
         {uploading && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
