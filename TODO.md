@@ -1,3 +1,3 @@
-- [ ] package.json
-  - [ ] Backend
-  - [ ] Frontend
+- [X] package.json
+  - [X] Backend
+  - [X] Frontend
