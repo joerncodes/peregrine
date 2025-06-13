@@ -29,6 +29,7 @@ function App() {
   const [search, setSearch] = useState("");
   const [selectedImage, setSelectedImage] = useState<ImageMeta | null>(null);
   const [showDropzoneOverlay, setShowDropzoneOverlay] = useState(false);
+  const [uploading, setUploading] = useState(false);
 
   async function fetchImages(search: string = "") {
     const response = await fetch(
@@ -92,7 +93,7 @@ function App() {
             placeholder="Search images..."
             className="bg-white/80 text-peregrine-primary-dark border-2 border-peregrine-primary focus:border-peregrine-highlight focus:ring-2 focus:ring-peregrine-highlight/50 shadow-md rounded-xl px-4 py-2 transition-all w-full"
             autoFocus
-            disabled={!loaded}
+            disabled={!loaded || uploading}
             onChange={(e) => {
               setSearch(e.target.value);
             }}
@@ -104,11 +105,11 @@ function App() {
             <div className="fixed inset-0 z-20 flex items-center justify-center pointer-events-none">
               <Dropzone
                 onDrop={async (acceptedFiles: File[]) => {
+                  setUploading(true);
                   let successCount = 0;
                   await Promise.all(
                     acceptedFiles.map(async (file) => {
-                      // Check if file type is an image
-                      if (!file.type.startsWith('image/')) {
+                      if (!file.type.startsWith("image/")) {
                         toast.error(`${file.name} is not an image file`);
                         return;
                       }
@@ -121,10 +122,15 @@ function App() {
                       successCount++;
                     })
                   );
-                  if (successCount > 0) {
-                    toast.success(`${successCount} image${successCount > 1 ? 's' : ''} uploaded.`);
-                  } 
-                  setTimeout(() => fetchImages(search), 1000); // Wait 1 second before searching
+                  setTimeout(() => {
+                    if (successCount > 0) {
+                      toast.success(
+                        `${successCount} image${successCount > 1 ? "s" : ""} uploaded.`
+                      );
+                    }
+                    fetchImages(search);
+                    setUploading(false);
+                  }, 1000);
                 }}
               >
                 {() => (
@@ -142,7 +148,9 @@ function App() {
             </div>
           )}
           {/* End Dropzone overlay */}
-          <div className="container mx-auto px-4">
+          <div
+            className={`container mx-auto px-4 ${uploading ? "pointer-events-none opacity-50 select-none" : ""}`}
+          >
             {images.length > 0 && (
               <div className="flex justify-center">
                 <h2 className="text-md text-peregrine-text/70 text-center mb-6 flex gap-2 items-center">
@@ -163,7 +171,9 @@ function App() {
               </div>
             ) : (
               <div className="text-center text-peregrine-text text-lg">
-                No images found. ¯\_(ツ)_/¯<br />Try uploading some.
+                No images found. ¯\_(ツ)_/¯
+                <br />
+                Try uploading some.
               </div>
             )}
           </div>
@@ -196,6 +206,7 @@ function App() {
                       selectedImage &&
                       window.open(selectedImage.filePath, "_blank")
                     }
+                    disabled={uploading}
                   >
                     <ZoomInIcon className="w-5 h-5" />
                   </Button>
@@ -210,6 +221,7 @@ function App() {
                       a.download = selectedImage.title;
                       a.click();
                     }}
+                    disabled={uploading}
                   >
                     <DownloadIcon className="w-5 h-5" />
                   </Button>
@@ -256,6 +268,7 @@ function App() {
                         console.error("Failed to copy image:", err);
                       }
                     }}
+                    disabled={uploading}
                   >
                     <ClipboardIcon className="w-5 h-5" />
                   </Button>
@@ -280,6 +293,35 @@ function App() {
           </SheetContent>
         </Sheet>
         <Toaster />
+        {uploading && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+            <div className="bg-white rounded-xl shadow-lg p-8 flex flex-col items-center gap-4">
+              <svg
+                className="animate-spin h-8 w-8 text-peregrine-primary"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                ></circle>
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8v8z"
+                ></path>
+              </svg>
+              <span className="text-peregrine-primary text-lg font-semibold">
+                Uploading...
+              </span>
+            </div>
+          </div>
+        )}
       </div>
     </>
   );
