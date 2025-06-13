@@ -48,7 +48,15 @@ function App() {
         <div className="flex gap-4">
           <Dropzone
             onDrop={(acceptedFiles: File[]) => {
-              console.log(acceptedFiles);
+              acceptedFiles.forEach(async (file) => {
+                const formData = new FormData();
+                formData.append("image", file);
+                const response = await fetch("http://localhost:3001/upload", {
+                  method: "POST",
+                  body: formData,
+                });
+                console.log(response);
+              });
             }}
           />
           {images.map((image) => (
