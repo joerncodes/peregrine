@@ -3,6 +3,17 @@
 
 @custom-variant dark (&:is(.dark *));
 
+@theme {
+  --color-peregrine-background: #F5F4F2;
+  --color-peregrine-text: #1F1F1F;
+  --color-peregrine-primary: #E78A1D;
+  --color-peregrine-primary-dark: #C06C1A;
+  --color-peregrine-highlight: #F8C875;
+  --color-peregrine-secondary: #3C4B69;
+  --color-peregrine-error: #E84855;
+  --color-peregrine-success: #4F9D69;
+}
+
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);

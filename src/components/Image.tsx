@@ -8,7 +8,7 @@ export default function Image({
   onClick?: () => void;
 }) {
   return (
-    <figure>
+    <figure className="flex flex-col items-center gap-1">
       <img
         onClick={onClick}
         className="rounded-lg border-2 border-slate-600 hover:scale-103 cursor-pointer transition-all duration-100"
@@ -16,7 +16,7 @@ export default function Image({
         alt={image.title}
         style={{ width: "250px", height: "250px", objectFit: "cover" }}
       />
-      <figcaption className="text-sm text-slate-500 text-center">
+      <figcaption className="text-sm text-peregrine-primary">
         {image.title}
       </figcaption>
     </figure>

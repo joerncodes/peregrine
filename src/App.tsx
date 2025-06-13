@@ -37,13 +37,13 @@ function App() {
 
   return (
     <>
-      <header className="bg-slate-600 text-slate-200 p-8 flex items-center gap-4">
+      <header className="bg-peregrine-primary text-peregrine-text p-8 flex items-center gap-4 shadow-md">
         <img src={peregrineLogo} alt="Peregrine" className="w-14 h-14" />
         <h1 className="text-4xl font-bold text-center">Peregrine</h1>
         <Input
           type="text"
           placeholder="Search"
-          className="w-full"
+          className="w-full bg-peregrine-background text-peregrine-highlight-dark"
           autoFocus
           disabled={!loaded}
           onChange={(e) => {
@@ -103,12 +103,17 @@ function App() {
                 >
                   <ZoomInIcon className="w-4 h-4" />
                 </Button>
-                <Button variant="secondary" size="icon" title="Download" onClick={() => {
-                  const a = document.createElement("a");
-                  a.href = selectedImage.filePath;
-                  a.download = selectedImage.title;
-                  a.click();
-                }}>
+                <Button
+                  variant="secondary"
+                  size="icon"
+                  title="Download"
+                  onClick={() => {
+                    const a = document.createElement("a");
+                    a.href = selectedImage.filePath;
+                    a.download = selectedImage.title;
+                    a.click();
+                  }}
+                >
                   <DownloadIcon className="w-4 h-4" />
                 </Button>
                 <Button
