@@ -3,10 +3,9 @@ import type { DragEvent } from "react";
 import peregrineLogo from "./assets/peregrine.png";
 import "./App.css";
 import type { ImageMeta } from "./@types/ImageMeta";
-import SearchFactory from "./search/SearchFactory";
 import { Input } from "./components/ui/input";
 import Image from "./components/Image";
-import Dropzone, { type DropzoneState } from "shadcn-dropzone";
+import Dropzone from "shadcn-dropzone";
 import {
   Sheet,
   SheetContent,
@@ -14,7 +13,13 @@ import {
   SheetTitle,
 } from "./components/ui/sheet";
 import { Button } from "./components/ui/button";
-import { ClipboardIcon, DownloadIcon, UploadIcon, ZoomInIcon } from "lucide-react";
+import {
+  ClipboardIcon,
+  DownloadIcon,
+  InfoIcon,
+  UploadIcon,
+  ZoomInIcon,
+} from "lucide-react";
 import { Toaster } from "./components/ui/sonner";
 import { toast } from "sonner";
 
@@ -26,10 +31,11 @@ function App() {
   const [showDropzoneOverlay, setShowDropzoneOverlay] = useState(false);
 
   async function fetchImages(search: string = "") {
-    const result = await SearchFactory.getInstance()
-      .index("images")
-      .search(search);
-    setImages(result.hits as ImageMeta[]);
+    const response = await fetch(
+      `http://localhost:3001/search?q=${encodeURIComponent(search)}`
+    );
+    const images = await response.json();
+    setImages(images);
     setLoaded(true);
   }
 
@@ -42,7 +48,10 @@ function App() {
     const handleDragEnter = (e: Event) => {
       const event = e as unknown as DragEvent;
       dragCounter++;
-      if (event.dataTransfer && Array.from(event.dataTransfer.types).includes("Files")) {
+      if (
+        event.dataTransfer &&
+        Array.from(event.dataTransfer.types).includes("Files")
+      ) {
         setShowDropzoneOverlay(true);
       }
     };
@@ -73,7 +82,7 @@ function App() {
           <img
             src={peregrineLogo}
             alt="Peregrine"
-            className="w-16 h-16 drop-shadow-lg"
+            className="w-16 h-16 drop-shadow-lg -rotate-2"
           />
           <h1 className="text-5xl font-extrabold tracking-tight text-center ">
             Peregrine
@@ -106,7 +115,7 @@ function App() {
                     })
                   );
                   toast.success("Images uploaded");
-                  await fetchImages(search);
+                  setTimeout(() => fetchImages(search), 1000); // Wait 1 second before searching
                 }}
               >
                 {() => (
@@ -116,7 +125,7 @@ function App() {
                   >
                     <div className="flex items-center gap-2 text-peregrine-primary-dark text-xl">
                       <UploadIcon className="w-8 h-8" />
-                        Drop files to upload.
+                      Drop files to upload.
                     </div>
                   </div>
                 )}
@@ -124,16 +133,30 @@ function App() {
             </div>
           )}
           {/* End Dropzone overlay */}
-          <div className="container mx-auto">
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8">
-              {images.map((image) => (
-                <Image
-                  key={image.id}
-                  image={image}
-                  onClick={() => setSelectedImage(image)}
-                />
-              ))}
-            </div>
+          <div className="container mx-auto px-4">
+            {images.length > 0 && (
+              <div className="flex justify-center">
+                <h2 className="text-md text-peregrine-text/70 text-center mb-6 flex gap-2 items-center">
+                  <InfoIcon className="w-4 h-4" />
+                  {images.length} images {search ? `for "${search}"` : ""} found
+                </h2>
+              </div>
+            )}
+            {images.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                {images.map((image) => (
+                  <Image
+                    key={image.id}
+                    image={image}
+                    onClick={() => setSelectedImage(image)}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="text-center text-peregrine-text text-lg">
+                No images found. ¯\_(ツ)_/¯<br />Try uploading some.
+              </div>
+            )}
           </div>
         </main>
 

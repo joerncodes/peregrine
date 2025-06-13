@@ -10,6 +10,7 @@ dotenv.config();
 const app = express();
 const port = 3001;
 app.use(cors());
+import fs from "fs";
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -42,6 +43,7 @@ app.post("/upload", upload.single("image"), (req, res) => {
     description: "",
     tags: [],
     filePath: "/images/" + req.file.filename,
+    createdAt: new Date().toISOString(),
   };
 
   const meilisearch = new Meilisearch({
@@ -62,6 +64,48 @@ app.post("/upload", upload.single("image"), (req, res) => {
       console.error("Failed to index image:", err);
       return res.status(500).json({ error: "Failed to index image" });
     });
+});
+
+app.get('/reset', (req, res) => {
+  const meilisearch = new Meilisearch({
+    host: "http://localhost:7700",
+    apiKey: process.env.VITE_MEILI_MASTER_KEY,
+  });
+  meilisearch.index("images").deleteAllDocuments();
+  // Delete all images from /public/images
+  const imagesDir = path.join(process.cwd(), 'public/images');
+  fs.readdir(imagesDir, (err, files) => {
+    if (err) {
+      console.error('Error reading images directory:', err);
+      return res.status(500).json({ error: 'Failed to read images directory' });
+    }
+
+    files.forEach(file => {
+      fs.unlink(path.join(imagesDir, file), err => {
+        if (err) console.error('Error deleting file:', file, err);
+      });
+    });
+  });
+
+  res.json({ message: 'Images reset successful' });
+});
+
+app.get("/search", async (req, res) => {
+  const { q = "" } = req.query;
+  const meilisearch = new Meilisearch({
+    host: "http://localhost:7700",
+    apiKey: process.env.VITE_MEILI_MASTER_KEY,
+  });
+  try {
+    const result = await meilisearch.index("images").search(q, {
+      limit: 1000,
+      sort: ["createdAt:desc"]
+    });
+    res.json(result.hits);
+  } catch (err) {
+    console.error("Search failed:", err);
+    res.status(500).json({ error: "Search failed" });
+  }
 });
 
 app.listen(port, () => {
