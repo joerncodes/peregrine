@@ -104,17 +104,26 @@ function App() {
             <div className="fixed inset-0 z-20 flex items-center justify-center pointer-events-none">
               <Dropzone
                 onDrop={async (acceptedFiles: File[]) => {
+                  let successCount = 0;
                   await Promise.all(
                     acceptedFiles.map(async (file) => {
+                      // Check if file type is an image
+                      if (!file.type.startsWith('image/')) {
+                        toast.error(`${file.name} is not an image file`);
+                        return;
+                      }
                       const formData = new FormData();
                       formData.append("image", file);
                       await fetch("http://localhost:3001/upload", {
                         method: "POST",
                         body: formData,
                       });
+                      successCount++;
                     })
                   );
-                  toast.success("Images uploaded");
+                  if (successCount > 0) {
+                    toast.success(`${successCount} image${successCount > 1 ? 's' : ''} uploaded.`);
+                  } 
                   setTimeout(() => fetchImages(search), 1000); // Wait 1 second before searching
                 }}
               >
