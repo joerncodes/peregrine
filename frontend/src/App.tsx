@@ -21,7 +21,7 @@ function App() {
 
   async function fetchImages(search: string = "") {
     const response = await fetch(
-      `http://localhost:3001/search?q=${encodeURIComponent(search)}`
+      `/api/search?q=${encodeURIComponent(search)}`
     );
     const images = await response.json();
     setImages(images);
@@ -103,7 +103,7 @@ function App() {
                       }
                       const formData = new FormData();
                       formData.append("image", file);
-                      await fetch("http://localhost:3001/upload", {
+                      await fetch("/api/upload", {
                         method: "POST",
                         body: formData,
                       });

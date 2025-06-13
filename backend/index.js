@@ -15,7 +15,7 @@ import fs from "fs";
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, "public/images/");
+    cb(null, "/app/public/images/");
   },
   filename: function (req, file, cb) {
     const randomPrefix = Math.random().toString(36).substring(2, 15);
@@ -24,6 +24,11 @@ const storage = multer.diskStorage({
     const finalName = randomPrefix + "-" + baseName + "." + extension;
     cb(null, finalName);
   },
+});
+
+const meilisearch = new Meilisearch({
+  host: process.env.MEILI_HOST,
+  apiKey: process.env.MEILI_MASTER_KEY,
 });
 
 const upload = multer({ storage });
@@ -36,7 +41,7 @@ app.post("/upload", upload.single("image"), (req, res) => {
   if (!req.file) {
     return res.status(400).json({ error: "No file uploaded" });
   }
-  const title= path.parse(req.file.originalname).name;
+  const title = path.parse(req.file.originalname).name;
   const id = slugify(title, { lower: true, remove: /[.]/g });
   const imageData = {
     id,
@@ -46,10 +51,6 @@ app.post("/upload", upload.single("image"), (req, res) => {
     createdAt: new Date().toISOString(),
   };
 
-  const meilisearch = new Meilisearch({
-    host: "http://localhost:7700",
-    apiKey: process.env.VITE_MEILI_MASTER_KEY,
-  });
   meilisearch
     .index("images")
     .addDocuments([imageData])
@@ -66,61 +67,47 @@ app.post("/upload", upload.single("image"), (req, res) => {
     });
 });
 
-app.delete('/image/:id', (req, res) => {
+app.delete("/image/:id", (req, res) => {
   const { id } = req.params;
-  const meilisearch = new Meilisearch({
-    host: "http://localhost:7700",
-    apiKey: process.env.VITE_MEILI_MASTER_KEY,
-  });
   meilisearch.index("images").deleteDocument(id);
   res.json({ message: "Image deleted" });
 });
-app.patch('/image/:id', (req, res) => {
+app.patch("/image/:id", (req, res) => {
   const { id } = req.params;
   const { title, description, tags } = req.body;
-  const meilisearch = new Meilisearch({
-    host: "http://localhost:7700",
-    apiKey: process.env.VITE_MEILI_MASTER_KEY,
-  });
-  meilisearch.index("images").updateDocuments([{
-    id,
-    title,
-    description,
-    tags,
-  }]);
+  meilisearch.index("images").updateDocuments([
+    {
+      id,
+      title,
+      description,
+      tags,
+    },
+  ]);
   res.json({ message: "Image updated" });
 });
 
-app.get('/reset', (req, res) => {
-  const meilisearch = new Meilisearch({
-    host: "http://localhost:7700",
-    apiKey: process.env.VITE_MEILI_MASTER_KEY,
-  });
+app.get("/reset", (req, res) => {
   meilisearch.index("images").delete();
-  // Delete all images from /public/images
-  const imagesDir = path.join(process.cwd(), 'public/images');
+  // Update the images directory path
+  const imagesDir = "/app/public/images";
   fs.readdir(imagesDir, (err, files) => {
     if (err) {
-      console.error('Error reading images directory:', err);
-      return res.status(500).json({ error: 'Failed to read images directory' });
+      console.error("Error reading images directory:", err);
+      return res.status(500).json({ error: "Failed to read images directory" });
     }
 
-    files.forEach(file => {
-      fs.unlink(path.join(imagesDir, file), err => {
-        if (err) console.error('Error deleting file:', file, err);
+    files.forEach((file) => {
+      fs.unlink(path.join(imagesDir, file), (err) => {
+        if (err) console.error("Error deleting file:", file, err);
       });
     });
   });
 
-  res.json({ message: 'Images reset successful' });
+  res.json({ message: "Images reset successful" });
 });
 
 app.get("/search", async (req, res) => {
   const { q = "" } = req.query;
-  const meilisearch = new Meilisearch({
-    host: "http://localhost:7700",
-    apiKey: process.env.VITE_MEILI_MASTER_KEY,
-  });
   async function doSearch() {
     return await meilisearch.index("images").search(q, {
       limit: 1000,
@@ -131,7 +118,10 @@ app.get("/search", async (req, res) => {
     const result = await doSearch();
     res.json(result.hits);
   } catch (err) {
-    console.error("Search failed, attempting to create index and set sortable attributes:", err);
+    console.error(
+      "Search failed, attempting to create index and set sortable attributes:",
+      err
+    );
     try {
       // Create the index if it doesn't exist
       await meilisearch.createIndex("images");
@@ -147,6 +137,6 @@ app.get("/search", async (req, res) => {
   }
 });
 
-app.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`);
+app.listen(port, "0.0.0.0", () => {
+  console.log(`Server running at http://0.0.0.0:${port}`);
 });

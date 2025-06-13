@@ -1,0 +1,3 @@
+- [ ] package.json
+  - [ ] Backend
+  - [ ] Frontend
