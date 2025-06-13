@@ -5,6 +5,7 @@ import type { ImageMeta } from "./@types/ImageMeta";
 import SearchFactory from "./search/SearchFactory";
 import { Input } from "./components/ui/input";
 import Image from "./components/Image";
+import Dropzone from "shadcn-dropzone";
 
 function App() {
   const [loaded, setLoaded] = useState(false);
@@ -45,6 +46,11 @@ function App() {
       </header>
       <main className="container mx-auto mt-10">
         <div className="flex gap-4">
+          <Dropzone
+            onDrop={(acceptedFiles: File[]) => {
+              console.log(acceptedFiles);
+            }}
+          />
           {images.map((image) => (
             <Image key={image.id} image={image} />
           ))}

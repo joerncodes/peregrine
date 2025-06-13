@@ -20,10 +20,10 @@ export default function Image({ image }: { image: ImageMeta }) {
             download={image.title || `image-${image.id}`}
           >
             <img
-              className="rounded-lg border-2 border-slate-600 hover:translate-y-[-2px] cursor-pointer transition-all duration-300"
+              className="rounded-lg border-2 border-slate-600 hover:-rotate-1 cursor-pointer transition-all duration-300"
               src={image.filePath}
               alt={image.title}
-              style={{ width: "250px", height: "250px" }}
+              style={{ width: "250px", height: "250px", objectFit: "cover" }}
             />
           </a>
         </ContextMenuTrigger>
