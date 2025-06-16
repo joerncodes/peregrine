@@ -1,4 +1,4 @@
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "./ui/sheet";
+import { Sheet, SheetContent} from "./ui/sheet";
 import { Button } from "./ui/button";
 import {
   ZoomInIcon,
