@@ -1,15 +1,14 @@
 import { useEffect, useState } from "react";
 import type { DragEvent } from "react";
-import peregrineLogo from "./assets/peregrine.png";
 import "./App.css";
 import type { ImageMeta } from "./@types/ImageMeta";
-import { Input } from "./components/ui/input";
 import Image from "./components/Image";
 import Dropzone from "shadcn-dropzone";
 import { Toaster } from "./components/ui/sonner";
 import { toast } from "sonner";
 import ImageSheet from "./components/ImageSheet";
 import { InfoIcon, UploadIcon } from "lucide-react";
+import Header from "./components/Header";
 
 function App() {
   const [loaded, setLoaded] = useState(false);
@@ -67,27 +66,12 @@ function App() {
   return (
     <>
       <div className="bg-gradient-to-br from-peregrine-background to-peregrine-highlight/30">
-        <header className="bg-gradient-to-r from-peregrine-primary to-peregrine-highlight text-peregrine-text p-8 flex items-center gap-6 shadow-lg rounded-b-2xl mb-8">
-          <img
-            src={peregrineLogo}
-            alt="Peregrine"
-            className="w-16 h-16 drop-shadow-lg -rotate-2"
-          />
-          <h1 className="text-5xl font-extrabold tracking-tight text-center ">
-            Peregrine
-          </h1>
-          <Input
-            type="text"
-            placeholder="Search images..."
-            className="bg-white/80 text-peregrine-primary-dark border-2 border-peregrine-primary focus:border-peregrine-highlight focus:ring-2 focus:ring-peregrine-highlight/50 shadow-md rounded-xl px-4 py-2 transition-all w-full"
-            autoFocus
-            disabled={!loaded || uploading}
-            onChange={(e) => {
-              setSearch(e.target.value);
-            }}
-          />
-        </header>
         <main className="min-h-screen pb-20">
+          <Header
+            loaded={loaded}
+            uploading={uploading}
+            setSearch={setSearch}
+          />
           {/* Dropzone overlay spanning the entire screen */}
           {showDropzoneOverlay && (
             <div className="fixed inset-0 z-20 flex items-center justify-center pointer-events-none">
@@ -137,7 +121,7 @@ function App() {
           )}
           {/* End Dropzone overlay */}
           <div
-            className={`container mx-auto px-4 ${uploading ? "pointer-events-none opacity-50 select-none" : ""}`}
+            className={`mx-auto px-4 ${uploading ? "pointer-events-none opacity-50 select-none" : ""}`}
           >
             {images.length > 0 && (
               <div className="flex justify-center">
@@ -148,7 +132,7 @@ function App() {
               </div>
             )}
             {images.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+              <div className="grid grid-cols-2 xs:grid-cols-1 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-6 xl:grid-cols-8 gap-4">
                 {images.map((image) => (
                   <Image
                     key={image.id}

@@ -11,6 +11,8 @@
     "search": "docker compose up meilisearch"
   },
   "dependencies": {
+    "@fontsource/limelight": "^5.2.6",
+    "@fontsource/open-sans": "^5.2.6",
     "@heroicons/react": "^2.2.0",
     "@hookform/resolvers": "^5.1.1",
     "@radix-ui/react-context-menu": "^2.2.15",

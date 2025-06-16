@@ -1,7 +1,14 @@
 @import 'tailwindcss';
 @import "tw-animate-css";
+@import "@fontsource/limelight/700.css";
+@import "@fontsource/open-sans/400.css";
 
 @custom-variant dark (&:is(.dark *));
+
+@theme {
+  --font-limelight: "Limelight", sans-serif;
+  --font-sans: "Open Sans", sans-serif;
+}
 
 @theme {
   --color-peregrine-background: #F5F4F2;

@@ -23,5 +23,12 @@ export default defineConfig({
         changeOrigin: true,
       },
     },
+    fs: {
+      // Allow serving files from one level up to the project root
+      allow: [
+        path.resolve(__dirname, '..'),
+        path.resolve(__dirname, 'node_modules/@fontsource'),
+      ],
+    },
   },
 });
