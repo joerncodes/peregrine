@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import type { ImageMeta } from "../@types/ImageMeta";
 import { toast } from "sonner";
-import React from "react";
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { Form, FormControl, FormField, FormItem, FormLabel } from "./ui/form";
 import { Input } from "./ui/input";
@@ -37,6 +37,21 @@ const ImageSheet: React.FC<ImageSheetProps> = ({
       tags: image?.tags,
     },
   });
+
+  useEffect(() => {
+    form.reset({
+      title: image?.title,
+      description: image?.description,
+      tags: image?.tags,
+    });
+  }, [image, form]);
+
+  useEffect(() => {
+    if (!open) {
+      form.reset();
+    }
+  }, [open, form]);
+
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="p-8 max-w-lg mx-auto bg-white/95 rounded-l-2xl shadow-2xl border-0">
@@ -132,7 +147,9 @@ const ImageSheet: React.FC<ImageSheetProps> = ({
                 className="hover:bg-peregrine-highlight/40 cursor-pointer"
                 onClick={async () => {
                   try {
-                    await navigator.clipboard.writeText(window.location.origin + image.filePath);
+                    await navigator.clipboard.writeText(
+                      window.location.origin + image.filePath
+                    );
                     toast.success("Image URL copied to clipboard");
                   } catch {
                     toast.error("Failed to copy URL");
@@ -161,7 +178,19 @@ const ImageSheet: React.FC<ImageSheetProps> = ({
                 }}
                 disabled={uploading}
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
               </Button>
             </div>
             <Form {...form}>
