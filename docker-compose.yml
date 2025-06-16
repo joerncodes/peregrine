@@ -5,6 +5,7 @@ services:
     ports:
       - "3033:80"
     environment:
+      - VITE_API_URL=http://localhost:3001
       - MEILI_HOST=http://meilisearch:7700
       - MEILI_MASTER_KEY=supersecretkey
     volumes:
