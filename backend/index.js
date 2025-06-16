@@ -5,6 +5,7 @@ import path from "path";
 import { Meilisearch } from "meilisearch";
 import dotenv from "dotenv";
 import slugify from "slugify";
+import sharp from "sharp";
 dotenv.config();
 
 const app = express();
@@ -45,34 +46,42 @@ app.get("/images/:filename", (req, res) => {
   res.sendFile(imagePath);
 });
 
-app.post("/upload", upload.single("image"), (req, res) => {
+app.post("/upload", upload.single("image"), async (req, res) => {
   if (!req.file) {
     return res.status(400).json({ error: "No file uploaded" });
   }
-  const title = path.parse(req.file.originalname).name;
-  const id = slugify(title, { lower: true, remove: /[.]/g });
-  const imageData = {
-    id,
-    title,
-    description: "",
-    filePath: "/images/" + req.file.filename,
-    createdAt: new Date().toISOString(),
-  };
+  
+  try {
+    const imagePath = path.join(imagesDir, req.file.filename);
+    const metadata = await sharp(imagePath).metadata();
+    
+    const title = path.parse(req.file.originalname).name;
+    const id = slugify(title, { lower: true, remove: /[.]/g });
+    const imageData = {
+      id,
+      title,
+      description: "",
+      filePath: "/images/" + req.file.filename,
+      createdAt: new Date().toISOString(),
+      dimensions: {
+        width: metadata.width,
+        height: metadata.height,
+        format: metadata.format,
+        size: req.file.size
+      }
+    };
 
-  meilisearch
-    .index("images")
-    .addDocuments([imageData])
-    .then((reponse) => {
-      console.log(reponse);
-      res.json({
-        message: "Image uploaded successfully",
-        filename: req.file.filename,
-      });
-    })
-    .catch((err) => {
-      console.error("Failed to index image:", err);
-      return res.status(500).json({ error: "Failed to index image" });
+    const response = await meilisearch.index("images").addDocuments([imageData]);
+    console.log(response);
+    res.json({
+      message: "Image uploaded successfully",
+      filename: req.file.filename,
+      dimensions: imageData.dimensions
     });
+  } catch (err) {
+    console.error("Failed to process or index image:", err);
+    return res.status(500).json({ error: "Failed to process or index image" });
+  }
 });
 
 app.delete("/image/:id", (req, res) => {
