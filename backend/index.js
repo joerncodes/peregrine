@@ -13,9 +13,11 @@ app.use(cors());
 app.use(express.json());
 import fs from "fs";
 
+const imagesDir = process.env.IMAGES_DIR;
+
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, "/app/public/images/");
+    cb(null, imagesDir);
   },
   filename: function (req, file, cb) {
     const randomPrefix = Math.random().toString(36).substring(2, 15);
@@ -35,6 +37,12 @@ const upload = multer({ storage });
 
 app.get("/", (req, res) => {
   res.json({ message: "Hello World!" });
+});
+
+app.get("/images/:filename", (req, res) => {
+  const { filename } = req.params;
+  const imagePath = path.join(imagesDir, filename);
+  res.sendFile(imagePath);
 });
 
 app.post("/upload", upload.single("image"), (req, res) => {
@@ -89,7 +97,6 @@ app.patch("/image/:id", (req, res) => {
 app.get("/reset", (req, res) => {
   meilisearch.index("images").delete();
   // Update the images directory path
-  const imagesDir = "/app/public/images";
   fs.readdir(imagesDir, (err, files) => {
     if (err) {
       console.error("Error reading images directory:", err);

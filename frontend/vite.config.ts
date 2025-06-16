@@ -13,7 +13,15 @@ export default defineConfig({
   },
   server: {
     proxy: {
-      "/api": "http://localhost:3001",
+      "/api": {
+        target: "http://localhost:3001",
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ""),
+      },
+      "/images": {
+        target: "http://localhost:3001",
+        changeOrigin: true,
+      },
     },
   },
 });

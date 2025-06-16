@@ -4,12 +4,11 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview",
     "prettier": "prettier --write --ignore-unknown",
-    "server": "node server/index.js"
+    "frontend": "cd frontend && yarn dev && cd ..",
+    "server": "cd backend && yarn dev && cd ..",
+    "search": "docker compose up meilisearch"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
