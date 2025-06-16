@@ -1,6 +1,6 @@
 @import 'tailwindcss';
 @import "tw-animate-css";
-@import "@fontsource/limelight/700.css";
+@import "@fontsource/limelight";
 @import "@fontsource/open-sans/400.css";
 
 @custom-variant dark (&:is(.dark *));

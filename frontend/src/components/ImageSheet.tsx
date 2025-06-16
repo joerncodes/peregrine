@@ -52,16 +52,30 @@ const ImageSheet: React.FC<ImageSheetProps> = ({
     }
   }, [open, form]);
 
+  useEffect(() => {
+    if (open) {
+      setTimeout(() => {
+        const titleInput = document.querySelector('input[name="title"]');
+        if (titleInput instanceof HTMLInputElement) {
+          titleInput.focus();
+          titleInput.select();
+        }
+      }, 100);
+    }
+  }, [open]);
+
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="p-8 max-w-lg mx-auto bg-white/95 rounded-l-2xl shadow-2xl border-0">
+      <SheetContent 
+        className="p-8 max-w-lg mx-auto bg-white/95 rounded-l-2xl shadow-2xl border-0"
+      >
         <SheetHeader>
-          <SheetTitle className="text-3xl font-bold text-peregrine-primary mb-2">
+          <SheetTitle className="text-4xl font-limelight font-extrabold text-peregrine-primary text-center">
             {image?.title}
           </SheetTitle>
         </SheetHeader>
         {image && (
-          <div className="mt-4 space-y-6">
+          <div className="space-y-6">
             <img
               src={image.filePath}
               alt={image.title}
@@ -211,13 +225,14 @@ const ImageSheet: React.FC<ImageSheetProps> = ({
                   onUpdate(image!);
                   onOpenChange(false);
                 })}
+                className="flex flex-col gap-4"
               >
                 <FormField
                   control={form.control}
                   name="title"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Title</FormLabel>
+                      <FormLabel className="text-md font-limelight text-peregrine-primary-dark">Image Title</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
@@ -236,10 +251,11 @@ const ImageSheet: React.FC<ImageSheetProps> = ({
                   name="description"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Description</FormLabel>
+                      <FormLabel className="text-md font-limelight text-peregrine-primary-dark">Description</FormLabel>
                       <FormControl>
                         <Textarea
                           {...field}
+                          className="min-h-48"
                           placeholder={image?.description}
                           value={field.value}
                           onChange={field.onChange}
@@ -251,7 +267,7 @@ const ImageSheet: React.FC<ImageSheetProps> = ({
                 />
                 <button
                   type="submit"
-                  className="mt-4 px-6 py-2 bg-peregrine-primary text-white rounded-lg font-semibold shadow hover:bg-peregrine-highlight transition disabled:opacity-50 flex items-center gap-2 "
+                  className="self-start mx-auto cursor-pointer mt-4 px-6 py-2 bg-peregrine-primary text-white rounded-lg font-semibold shadow hover:bg-peregrine-highlight transition disabled:opacity-50 flex items-center gap-2 "
                   disabled={uploading}
                 >
                   <SaveIcon className="w-5 h-5" />
