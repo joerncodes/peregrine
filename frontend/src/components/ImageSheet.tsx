@@ -1,4 +1,4 @@
-import { Sheet, SheetContent} from "./ui/sheet";
+import { Sheet, SheetContent } from "./ui/sheet";
 import { Button } from "./ui/button";
 import {
   ZoomInIcon,
@@ -22,6 +22,7 @@ import {
   CardHeader,
   CardTitle,
 } from "./ui/card";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
 interface ImageSheetProps {
   image: ImageMeta | null;
@@ -94,133 +95,160 @@ const ImageSheet: React.FC<ImageSheetProps> = ({
                 )}
               </CardContent>
               <CardFooter>
-                <div className="flex gap-4 justify-center">
-                  <Button
-                    variant="secondary"
-                    size="icon"
-                    title="Zoom"
-                    className="hover:bg-peregrine-highlight/40 cursor-pointer"
-                    onClick={() =>
-                      image && window.open(image.filePath, "_blank")
-                    }
-                    disabled={uploading}
-                  >
-                    <ZoomInIcon className="w-5 h-5" />
-                  </Button>
-                  <Button
-                    variant="secondary"
-                    size="icon"
-                    title="Download"
-                    className="hover:bg-peregrine-highlight/40 cursor-pointer"
-                    onClick={() => {
-                      const a = document.createElement("a");
-                      a.href = image.filePath;
-                      a.download = image.title;
-                      a.click();
-                    }}
-                    disabled={uploading}
-                  >
-                    <DownloadIcon className="w-5 h-5" />
-                  </Button>
-                  <Button
-                    variant="secondary"
-                    size="icon"
-                    title="Copy to clipboard"
-                    className="hover:bg-peregrine-highlight/40 cursor-pointer"
-                    onClick={async () => {
-                      try {
-                        const img = new window.Image();
-                        img.crossOrigin = "anonymous";
-                        img.src = image.filePath;
+                <div className="flex-wrap flex gap-4 max-w-full justify-center items-center">
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <Button
+                        variant="secondary"
+                        size="icon"
+                        title="Zoom"
+                        className="hover:bg-peregrine-highlight/40 cursor-pointer"
+                        onClick={() =>
+                          image && window.open(image.filePath, "_blank")
+                        }
+                        disabled={uploading}
+                      >
+                        <ZoomInIcon className="w-5 h-5" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>Open in new tab</TooltipContent>
+                  </Tooltip>
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <Button
+                        variant="secondary"
+                        size="icon"
+                        title="Download"
+                        className="hover:bg-peregrine-highlight/40 cursor-pointer"
+                        onClick={() => {
+                          const a = document.createElement("a");
+                          a.href = image.filePath;
+                          a.download = image.title;
+                          a.click();
+                        }}
+                        disabled={uploading}
+                      >
+                        <DownloadIcon className="w-5 h-5" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>Download</TooltipContent>
+                  </Tooltip>
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <Button
+                        variant="secondary"
+                        size="icon"
+                        title="Copy to clipboard"
+                        className="hover:bg-peregrine-highlight/40 cursor-pointer"
+                        onClick={async () => {
+                          try {
+                            const img = new window.Image();
+                            img.crossOrigin = "anonymous";
+                            img.src = image.filePath;
 
-                        img.onload = async () => {
-                          const canvas = document.createElement("canvas");
-                          canvas.width = img.width;
-                          canvas.height = img.height;
-                          const ctx = canvas.getContext("2d");
-                          ctx?.drawImage(img, 0, 0);
+                            img.onload = async () => {
+                              const canvas = document.createElement("canvas");
+                              canvas.width = img.width;
+                              canvas.height = img.height;
+                              const ctx = canvas.getContext("2d");
+                              ctx?.drawImage(img, 0, 0);
 
-                          canvas.toBlob(async (blob) => {
-                            if (blob) {
-                              try {
-                                await navigator.clipboard.write([
-                                  new window.ClipboardItem({
-                                    "image/png": blob,
-                                  }),
-                                ]);
-                                toast.success("Image copied to clipboard");
-                                onOpenChange(false);
-                              } catch (err) {
-                                toast.error("Failed to copy image. :(");
-                                console.error("Failed to copy image:", err);
-                              }
-                            }
-                          }, "image/png");
-                        };
+                              canvas.toBlob(async (blob) => {
+                                if (blob) {
+                                  try {
+                                    await navigator.clipboard.write([
+                                      new window.ClipboardItem({
+                                        "image/png": blob,
+                                      }),
+                                    ]);
+                                    toast.success("Image copied to clipboard");
+                                    onOpenChange(false);
+                                  } catch (err) {
+                                    toast.error("Failed to copy image. :(");
+                                    console.error("Failed to copy image:", err);
+                                  }
+                                }
+                              }, "image/png");
+                            };
 
-                        img.onerror = () => {
-                          console.error("Failed to load image for copying.");
-                        };
-                      } catch (err) {
-                        console.error("Failed to copy image:", err);
-                      }
-                    }}
-                    disabled={uploading}
-                  >
-                    <ClipboardIcon className="w-5 h-5" />
-                  </Button>
-                  <Button
-                    variant="secondary"
-                    size="icon"
-                    title="Copy URL"
-                    className="hover:bg-peregrine-highlight/40 cursor-pointer"
-                    onClick={async () => {
-                      try {
-                        await navigator.clipboard.writeText(
-                          window.location.origin + image.filePath
-                        );
-                        toast.success("Image URL copied to clipboard");
-                      } catch {
-                        toast.error("Failed to copy URL");
-                      }
-                    }}
-                    disabled={uploading}
-                  >
-                    <LinkIcon className="w-5 h-5" />
-                  </Button>
-                  <Button
-                    variant="secondary"
-                    size="icon"
-                    title="Delete"
-                    className="hover:bg-red-600/80 cursor-pointer"
-                    onClick={async () => {
-                      try {
-                        await fetch(`/api/image/${image.id}`, {
-                          method: "DELETE",
-                        });
-                        toast.success("Image deleted");
-                        onUpdate(image);
-                        onOpenChange(false);
-                      } catch {
-                        toast.error("Failed to delete image");
-                      }
-                    }}
-                    disabled={uploading}
-                  >
-                    <svg
-                      className="w-5 h-5"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M6 18L18 6M6 6l12 12"
-                      />
-                    </svg>
-                  </Button>
+                            img.onerror = () => {
+                              console.error(
+                                "Failed to load image for copying."
+                              );
+                            };
+                          } catch (err) {
+                            console.error("Failed to copy image:", err);
+                          }
+                        }}
+                        disabled={uploading}
+                      >
+                        <ClipboardIcon className="w-5 h-5" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>Copy to clipboard</TooltipContent>
+                  </Tooltip>
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <Button
+                        variant="secondary"
+                        size="icon"
+                        title="Copy URL"
+                        className="hover:bg-peregrine-highlight/40 cursor-pointer"
+                        onClick={async () => {
+                          try {
+                            await navigator.clipboard.writeText(
+                              window.location.origin + image.filePath
+                            );
+                            toast.success("Image URL copied to clipboard");
+                          } catch {
+                            toast.error("Failed to copy URL");
+                          }
+                        }}
+                        disabled={uploading}
+                      >
+                        <LinkIcon className="w-5 h-5" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>Copy URL</TooltipContent>
+                  </Tooltip>
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <Button
+                        variant="secondary"
+                        size="icon"
+                        title="Delete"
+                        className="hover:bg-red-600/80 cursor-pointer"
+                        onClick={async () => {
+                          try {
+                            await fetch(`/api/image/${image.id}`, {
+                              method: "DELETE",
+                            });
+                            toast.success("Image deleted");
+                            onUpdate(image);
+                            onOpenChange(false);
+                          } catch {
+                            toast.error("Failed to delete image");
+                          }
+                        }}
+                        disabled={uploading}
+                      >
+                        <svg
+                          className="w-5 h-5"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M6 18L18 6M6 6l12 12"
+                          />
+                        </svg>
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>Delete</TooltipContent>
+                  </Tooltip>
                 </div>
               </CardFooter>
             </Card>
