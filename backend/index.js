@@ -14,7 +14,7 @@ app.use(cors());
 app.use(express.json());
 import fs from "fs";
 
-const imagesDir = process.env.IMAGES_DIR;
+const imagesDir = process.env.IMAGES_DIR || "/app/public/images";
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -23,7 +23,8 @@ const storage = multer.diskStorage({
   filename: function (req, file, cb) {
     const randomPrefix = Math.random().toString(36).substring(2, 15);
     const extension = file.mimetype.split("/")[1];
-    const baseName = path.parse(file.originalname).name;
+    const originalName = file.originalname || `upload-${Date.now()}`;
+    const baseName = path.parse(originalName).name;
     const finalName = randomPrefix + "-" + baseName + "." + extension;
     cb(null, finalName);
   },
