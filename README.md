@@ -1,4 +1,4 @@
-![](src/assets/peregrine.png)
+![](frontend/src/assets/peregrine.png)
 # Peregrine — Lightning fast self-hosted image library
 
 **Peregrine** is a modern, self-hosted image library that lets you upload, search, and manage images with a beautiful, responsive web interface. It features drag-and-drop uploads, instant search, and image management powered by a fast backend and Meilisearch.
