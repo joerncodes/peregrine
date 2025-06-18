@@ -195,7 +195,7 @@ const ImageSheet: React.FC<ImageSheetProps> = ({
                     className="hover:bg-red-600/80 cursor-pointer"
                     onClick={async () => {
                       try {
-                        await fetch(`http://localhost:3001/image/${image.id}`, {
+                        await fetch(`/api/image/${image.id}`, {
                           method: "DELETE",
                         });
                         toast.success("Image deleted");
@@ -231,7 +231,7 @@ const ImageSheet: React.FC<ImageSheetProps> = ({
                     ...values,
                     id: image?.id,
                   };
-                  await fetch(`http://localhost:3001/image/${image?.id}`, {
+                  await fetch(`/api/image/${image?.id}`, {
                     method: "PATCH",
                     headers: {
                       "Content-Type": "application/json",
