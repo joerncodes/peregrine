@@ -7,8 +7,9 @@ import Dropzone from "shadcn-dropzone";
 import { Toaster } from "./components/ui/sonner";
 import { toast } from "sonner";
 import ImageSheet from "./components/ImageSheet";
-import { InfoIcon, UploadIcon } from "lucide-react";
+import { FileQuestionIcon, InfoIcon, UploadIcon } from "lucide-react";
 import Header from "./components/Header";
+import { Alert, AlertDescription, AlertTitle } from "./components/ui/alert";
 
 function App() {
   const [loaded, setLoaded] = useState(false);
@@ -19,9 +20,7 @@ function App() {
   const [uploading, setUploading] = useState(false);
 
   async function fetchImages(search: string = "") {
-    const response = await fetch(
-      `/api/search?q=${encodeURIComponent(search)}`
-    );
+    const response = await fetch(`/api/search?q=${encodeURIComponent(search)}`);
     const images = await response.json();
     setImages(images);
     setLoaded(true);
@@ -63,6 +62,39 @@ function App() {
     };
   }, []);
 
+  // Extract the upload logic into a reusable function
+  const handleUpload = async (files: FileList | File[]) => {
+    setUploading(true);
+    let successCount = 0;
+    const fileArray = Array.from(files);
+
+    await Promise.all(
+      fileArray.map(async (file) => {
+        if (!file.type.startsWith("image/")) {
+          toast.error(`${file.name} is not an image file`);
+          return;
+        }
+        const formData = new FormData();
+        formData.append("image", file);
+        await fetch("/api/upload", {
+          method: "POST",
+          body: formData,
+        });
+        successCount++;
+      })
+    );
+
+    setTimeout(() => {
+      if (successCount > 0) {
+        toast.success(
+          `${successCount} image${successCount > 1 ? "s" : ""} uploaded.`
+        );
+      }
+      fetchImages(search);
+      setUploading(false);
+    }, 1000);
+  };
+
   return (
     <>
       <div className="bg-gradient-to-br from-peregrine-background to-peregrine-highlight/30">
@@ -71,40 +103,12 @@ function App() {
             loaded={loaded}
             uploading={uploading}
             setSearch={setSearch}
+            onUpload={handleUpload}
           />
           {/* Dropzone overlay spanning the entire screen */}
           {showDropzoneOverlay && (
             <div className="fixed inset-0 z-20 flex items-center justify-center pointer-events-none">
-              <Dropzone
-                onDrop={async (acceptedFiles: File[]) => {
-                  setUploading(true);
-                  let successCount = 0;
-                  await Promise.all(
-                    acceptedFiles.map(async (file) => {
-                      if (!file.type.startsWith("image/")) {
-                        toast.error(`${file.name} is not an image file`);
-                        return;
-                      }
-                      const formData = new FormData();
-                      formData.append("image", file);
-                      await fetch("/api/upload", {
-                        method: "POST",
-                        body: formData,
-                      });
-                      successCount++;
-                    })
-                  );
-                  setTimeout(() => {
-                    if (successCount > 0) {
-                      toast.success(
-                        `${successCount} image${successCount > 1 ? "s" : ""} uploaded.`
-                      );
-                    }
-                    fetchImages(search);
-                    setUploading(false);
-                  }, 1000);
-                }}
-              >
+              <Dropzone onDrop={handleUpload}>
                 {() => (
                   <div
                     className="transition-opacity duration-200 fixed inset-0 flex items-center justify-center bg-white/80 border-2 border-dashed border-peregrine-primary pointer-events-auto opacity-100"
@@ -132,7 +136,10 @@ function App() {
               </div>
             )}
             {images.length > 0 ? (
-              <div className="grid grid-cols-2 xs:grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4" style={{ gridTemplateRows: 'masonry' }}>
+              <div
+                className="grid grid-cols-2 xs:grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4"
+                style={{ gridTemplateRows: "masonry" }}
+              >
                 {images.map((image) => (
                   <Image
                     key={image.id}
@@ -142,11 +149,11 @@ function App() {
                 ))}
               </div>
             ) : (
-              <div className="text-center text-peregrine-text text-lg">
-                No images found. ¯\_(ツ)_/¯
-                <br />
-                Try uploading some.
-              </div>
+              <Alert className="bg-white/80 border-2 border-peregrine-primary w-full md:w-1/3 mx-auto">
+                <FileQuestionIcon className="mt-1" />
+                <AlertTitle className="text-lg font-limelight text-peregrine-primary">No images found</AlertTitle>
+                <AlertDescription className="flex text-black">Try uploading some by <strong className="text-peregrine-secondary">dragging and dropping</strong> or <strong className="text-peregrine-secondary">clicking the upload button</strong> above!</AlertDescription>
+              </Alert>
             )}
           </div>
         </main>
