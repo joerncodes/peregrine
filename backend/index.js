@@ -50,11 +50,11 @@ app.post("/upload", upload.single("image"), async (req, res) => {
   if (!req.file) {
     return res.status(400).json({ error: "No file uploaded" });
   }
-  
+
   try {
     const imagePath = path.join(imagesDir, req.file.filename);
     const metadata = await sharp(imagePath).metadata();
-    
+
     const title = path.parse(req.file.originalname).name;
     const id = slugify(title, { lower: true, remove: /[.]/g });
     const imageData = {
@@ -67,16 +67,18 @@ app.post("/upload", upload.single("image"), async (req, res) => {
         width: metadata.width,
         height: metadata.height,
         format: metadata.format,
-        size: req.file.size
-      }
+        size: req.file.size,
+      },
     };
 
-    const response = await meilisearch.index("images").addDocuments([imageData]);
+    const response = await meilisearch
+      .index("images")
+      .addDocuments([imageData]);
     console.log(response);
     res.json({
       message: "Image uploaded successfully",
       filename: req.file.filename,
-      dimensions: imageData.dimensions
+      dimensions: imageData.dimensions,
     });
   } catch (err) {
     console.error("Failed to process or index image:", err);
@@ -153,6 +155,18 @@ app.get("/search", async (req, res) => {
   }
 });
 
-app.listen(port, "0.0.0.0", () => {
+async function initializeIndex() {
+  try {
+    await meilisearch.createIndex("images");
+    await meilisearch.index("images").updateSortableAttributes(["createdAt"]);
+    console.log("Index created and sortable attributes set");
+  } catch (error) {
+    // Index might already exist, which is fine
+    console.log("Index initialization:", error.message);
+  }
+}
+
+app.listen(port, "0.0.0.0", async () => {
   console.log(`Server running at http://0.0.0.0:${port}`);
+  await initializeIndex();
 });
