@@ -12,12 +12,23 @@ export default function CopyToClipboardButton({
   uploading: boolean;
   variant: ActionButtonProps["variant"];
 }) {
+  let tooltip = "Copy to clipboard";
+  if (image.dimensions.format.toLowerCase() === "gif")
+    tooltip = "GIFs cannot be copied to clipboard";
+  if (!window.isSecureContext)
+    tooltip = "Copying images requires HTTPS or localhost";
+
+  const disabled =
+    uploading ||
+    image.dimensions.format.toLowerCase() === "gif" ||
+    !window.isSecureContext;
+
   return (
     <ActionButton
       icon={<ClipboardIcon />}
       onClick={() => imageToClipboard(image, () => {})}
-      disabled={uploading}
-      tooltip="Copy to clipboard"
+      disabled={disabled}
+      tooltip={tooltip}
       variant={variant}
       size="icon"
     />

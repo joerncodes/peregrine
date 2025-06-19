@@ -23,12 +23,15 @@ export default function CopyURLToClipboardButton({
     }
   }
 
+  const disabled = uploading || !window.isSecureContext;
+  const tooltip = disabled ? "Copying images requires HTTPS or localhost" : "Copy URL";
+
   return (
     <ActionButton
       icon={<LinkIcon />}
       onClick={onClick}
-      disabled={uploading}
-      tooltip="Copy URL"
+      disabled={disabled}
+      tooltip={tooltip}
       variant={variant}
       size="icon"
     />
