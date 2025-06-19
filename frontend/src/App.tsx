@@ -137,7 +137,7 @@ function App() {
             )}
             {images.length > 0 ? (
               <div
-                className="grid grid-cols-2 xs:grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4"
+                className="grid grid-cols-2 xs:grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 2xl:grid-cols-8 gap-4"
                 style={{ gridTemplateRows: "masonry" }}
               >
                 {images.map((image) => (
@@ -152,7 +152,7 @@ function App() {
               <Alert className="bg-white/80 border-2 border-peregrine-primary w-full md:w-1/3 mx-auto">
                 <FileQuestionIcon className="mt-1" />
                 <AlertTitle className="text-lg font-limelight text-peregrine-primary">No images found</AlertTitle>
-                <AlertDescription className="text-black inline">Try uploading some by <strong className="text-peregrine-secondary inline">dragging and dropping</strong> or <strong className="text-peregrine-secondary inline">clicking the upload button</strong> above!</AlertDescription>
+                <AlertDescription className="text-black">Try uploading some by <strong className="text-peregrine-secondary">dragging and dropping</strong> or <strong className="text-peregrine-secondary">clicking the upload button</strong> above!</AlertDescription>
               </Alert>
             )}
           </div>
