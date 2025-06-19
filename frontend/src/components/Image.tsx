@@ -7,22 +7,41 @@ import {
   CardTitle,
 } from "./ui/card";
 import ActionBar from "./ActionBar";
+import imageToClipboard from "@/lib/imageToClipboard";
+import canCopyToClipboard from "@/lib/canCopyToClipboard";
+import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 export default function Image({
   image,
-  onClick,
+  onEdit,
 }: {
   image: ImageMeta;
-  onClick?: () => void;
+  onEdit?: (image: ImageMeta) => void;
 }) {
   const size = (image.dimensions.size / 1024 / 1024).toFixed(2);
+  const canCopy = canCopyToClipboard(image);
   return (
     <Card className="pt-0 overflow-hidden bg-peregrine-secondary">
       <CardHeader className="p-0">
         <CardTitle className="sr-only"> {image.title}</CardTitle>
         <img
-          onClick={onClick}
-          className="w-full h-auto hover:scale-103 cursor-pointer transition-all duration-100"
+          onClick={() => {
+            if (canCopyToClipboard(image)) {
+              imageToClipboard(image, () => {
+                toast.success("Image copied to clipboard");
+              });
+            } else {
+              toast.error("Cannot copy to clipboard", {
+                description:
+                  "Copying images requires HTTPS or localhost. Also, GIFs cannot be copied to clipboard.",
+              });
+            }
+          }}
+          className={cn(
+            "w-full h-auto hover:scale-103 transition-all duration-100",
+            canCopy ? "cursor-pointer" : "cursor-not-allowed"
+          )}
           src={image.filePath}
           alt={image.title}
         />
@@ -35,7 +54,12 @@ export default function Image({
         </p>
       </CardContent>
       <CardFooter className="flex flex-wrap justify-center group">
-        <ActionBar image={image} uploading={false} variant="ghost" />
+        <ActionBar
+          image={image}
+          uploading={false}
+          variant="ghost"
+          onEdit={onEdit}
+        />
       </CardFooter>
     </Card>
   );

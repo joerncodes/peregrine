@@ -144,7 +144,7 @@ function App() {
                   <Image
                     key={image.id}
                     image={image}
-                    onClick={() => setSelectedImage(image)}
+                    onEdit={(image) => setSelectedImage(image)}
                   />
                 ))}
               </div>

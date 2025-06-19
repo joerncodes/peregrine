@@ -1,6 +1,7 @@
 import { DownloadIcon } from "lucide-react";
 import type { ImageMeta } from "../../@types/ImageMeta";
 import ActionButton, { type ActionButtonProps } from "./ActionButton";
+import imageDownload from "@/lib/imageDownload";
 
 export default function DownloadButton({
   image,
@@ -11,16 +12,10 @@ export default function DownloadButton({
   uploading: boolean;
   variant: ActionButtonProps["variant"];
 }) {
-  const onClick = () => {
-    const a = document.createElement("a");
-    a.href = image.filePath;
-    a.download = image.title;
-    a.click();
-  };
   return (
     <ActionButton
       icon={<DownloadIcon />}
-      onClick={onClick}
+      onClick={() => imageDownload(image)}
       disabled={uploading}
       tooltip="Download"
       variant={variant}
