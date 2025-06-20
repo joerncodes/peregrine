@@ -19,6 +19,25 @@ function App() {
   const [showDropzoneOverlay, setShowDropzoneOverlay] = useState(false);
   const [uploading, setUploading] = useState(false);
 
+  window.addEventListener("paste", async (event) => {
+    const items = event.clipboardData?.items;
+    if (!items) return;
+
+    const files: File[] = [];
+    for (const item of items) {
+      if (item.type.startsWith("image/")) {
+        const file = item.getAsFile();
+        if (file) {
+          files.push(file);
+        }
+      }
+    }
+    
+    if (files.length > 0) {
+      await handleUpload(files);
+    }
+  });
+
   async function fetchImages(search: string = "") {
     const response = await fetch(`/api/search?q=${encodeURIComponent(search)}`);
     const images = await response.json();
@@ -151,8 +170,20 @@ function App() {
             ) : (
               <Alert className="bg-white/80 border-2 border-peregrine-primary w-full md:w-1/3 mx-auto">
                 <FileQuestionIcon className="mt-1" />
-                <AlertTitle className="text-lg font-limelight text-peregrine-primary">No images found</AlertTitle>
-                <AlertDescription className="text-black">Try uploading some by <strong className="text-peregrine-secondary">dragging and dropping</strong> or <strong className="text-peregrine-secondary">clicking the upload button</strong> above!</AlertDescription>
+                <AlertTitle className="text-lg font-limelight text-peregrine-primary">
+                  No images found
+                </AlertTitle>
+                <AlertDescription className="text-black">
+                  Try uploading some by{" "}
+                  <strong className="text-peregrine-secondary">
+                    dragging and dropping
+                  </strong>{" "}
+                  or{" "}
+                  <strong className="text-peregrine-secondary">
+                    clicking the upload button
+                  </strong>{" "}
+                  above!
+                </AlertDescription>
               </Alert>
             )}
           </div>
