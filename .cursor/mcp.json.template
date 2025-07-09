@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "cursor-md-mem": {
+      "command": "sh",
+      "args": ["/path/to/your/mcp-servers/cursor-md-mem/startmcp.sh"],
+      "env": {
+        "NOTESTORE_PATH": "/path/to/your/docs/memory",
+        "SERVER_MODE": "stdio"
+      }
+    }
+  }
+}
