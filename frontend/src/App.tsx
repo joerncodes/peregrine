@@ -19,25 +19,6 @@ function App() {
   const [showDropzoneOverlay, setShowDropzoneOverlay] = useState(false);
   const [uploading, setUploading] = useState(false);
 
-  window.addEventListener("paste", async (event) => {
-    const items = event.clipboardData?.items;
-    if (!items) return;
-
-    const files: File[] = [];
-    for (const item of items) {
-      if (item.type.startsWith("image/")) {
-        const file = item.getAsFile();
-        if (file) {
-          files.push(file);
-        }
-      }
-    }
-    
-    if (files.length > 0) {
-      await handleUpload(files);
-    }
-  });
-
   async function fetchImages(search: string = "") {
     const response = await fetch(`/api/search?q=${encodeURIComponent(search)}`);
     const images = await response.json();
@@ -113,6 +94,32 @@ function App() {
       setUploading(false);
     }, 1000);
   };
+
+  useEffect(() => {
+    const handlePaste = async (event: ClipboardEvent) => {
+      const items = event.clipboardData?.items;
+      if (!items) return;
+
+      const files: File[] = [];
+      for (const item of items) {
+        if (item.type.startsWith("image/")) {
+          const file = item.getAsFile();
+          if (file) {
+            files.push(file);
+          }
+        }
+      }
+      
+      if (files.length > 0) {
+        await handleUpload(files);
+      }
+    };
+
+    window.addEventListener("paste", handlePaste);
+    return () => {
+      window.removeEventListener("paste", handlePaste);
+    };
+  }, [handleUpload]);
 
   return (
     <>

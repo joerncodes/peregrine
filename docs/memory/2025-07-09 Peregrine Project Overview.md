@@ -1,4 +1,4 @@
-# Peregrine Project Overview
+# 2025-07-09 Peregrine Project Overview
 
 ## Purpose
 Peregrine is a modern, self-hosted image library application that provides a lightning-fast, beautiful web interface for uploading, searching, and managing images. Built for users who want complete control over their image collections without relying on third-party services.
@@ -36,8 +36,8 @@ Peregrine is a modern, self-hosted image library application that provides a lig
 - **Fast**: Optimized for performance with modern web technologies
 
 ## Related Topics
-- [[Peregrine Architecture]]
-- [[Backend API Documentation]]
-- [[Frontend Components]]
-- [[Development Setup]]
-- [[Deployment Guide]]
+- [[2025-07-09 Peregrine Architecture]]
+- [[2025-07-09 Backend API Documentation]]
+- [[2025-07-09 Frontend Components]]
+- [[2025-07-09 Development Setup]]
+- [[2025-07-09 Deployment Guide]]

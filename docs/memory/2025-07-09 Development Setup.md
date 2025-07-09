@@ -1,4 +1,4 @@
-# Development Setup
+# 2025-07-09 Development Setup
 
 ## Prerequisites
 - **Node.js**: v18+ recommended
@@ -268,8 +268,8 @@ curl http://localhost:3001/
 ```
 
 ## Related Topics
-- [[Peregrine Project Overview]]
-- [[Peregrine Architecture]]
-- [[Backend API Documentation]]
-- [[Frontend Components]]
-- [[Deployment Guide]]
+- [[2025-07-09 Peregrine Project Overview]]
+- [[2025-07-09 Peregrine Architecture]]
+- [[2025-07-09 Backend API Documentation]]
+- [[2025-07-09 Frontend Components]]
+- [[2025-07-09 Deployment Guide]]

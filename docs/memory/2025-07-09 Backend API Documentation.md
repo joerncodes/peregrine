@@ -1,4 +1,4 @@
-# Backend API Documentation
+# 2025-07-09 Backend API Documentation
 
 ## Overview
 The Peregrine backend is a Node.js Express application that provides a RESTful API for image management and search functionality.
@@ -174,8 +174,8 @@ await meilisearch.index("images").updateSortableAttributes(["createdAt"]);
 - **General**: Proper HTTP status codes and error messages
 
 ## Related Topics
-- [[Peregrine Project Overview]]
-- [[Peregrine Architecture]]
-- [[Frontend Components]]
-- [[Development Setup]]
-- [[Deployment Guide]]
+- [[2025-07-09 Peregrine Project Overview]]
+- [[2025-07-09 Peregrine Architecture]]
+- [[2025-07-09 Frontend Components]]
+- [[2025-07-09 Development Setup]]
+- [[2025-07-09 Deployment Guide]]

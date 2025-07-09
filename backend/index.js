@@ -57,7 +57,12 @@ app.post("/upload", upload.single("image"), async (req, res) => {
     const metadata = await sharp(imagePath).metadata();
 
     const title = path.parse(req.file.originalname).name;
-    const id = slugify(title, { lower: true, remove: /[.]/g });
+    
+    // Always generate unique ID to prevent overwrites
+    const timestamp = Date.now();
+    const randomSuffix = Math.random().toString(36).substring(2, 7);
+    const id = slugify(`${title}-${timestamp}-${randomSuffix}`, { lower: true, remove: /[.]/g });
+    
     const imageData = {
       id,
       title,

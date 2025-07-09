@@ -1,4 +1,4 @@
-# Deployment Guide
+# 2025-07-09 Deployment Guide
 
 ## Overview
 Peregrine supports multiple deployment methods, from simple development setup to production-ready containerized deployment with Docker.
@@ -312,8 +312,8 @@ docker stats
 ```
 
 ## Related Topics
-- [[Peregrine Project Overview]]
-- [[Peregrine Architecture]]
-- [[Backend API Documentation]]
-- [[Frontend Components]]
-- [[Development Setup]]
+- [[2025-07-09 Peregrine Project Overview]]
+- [[2025-07-09 Peregrine Architecture]]
+- [[2025-07-09 Backend API Documentation]]
+- [[2025-07-09 Frontend Components]]
+- [[2025-07-09 Development Setup]]

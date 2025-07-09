@@ -1,4 +1,4 @@
-# Peregrine Architecture
+# 2025-07-09 Peregrine Architecture
 
 ## System Architecture
 Peregrine follows a modern full-stack architecture with clear separation of concerns:
@@ -90,8 +90,8 @@ Peregrine follows a modern full-stack architecture with clear separation of conc
 - **Production**: http://localhost:3033 (nginx proxy)
 
 ## Related Topics
-- [[Peregrine Project Overview]]
-- [[Backend API Documentation]]
-- [[Frontend Components]]
-- [[Development Setup]]
-- [[Deployment Guide]]
+- [[2025-07-09 Peregrine Project Overview]]
+- [[2025-07-09 Backend API Documentation]]
+- [[2025-07-09 Frontend Components]]
+- [[2025-07-09 Development Setup]]
+- [[2025-07-09 Deployment Guide]]

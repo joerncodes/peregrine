@@ -1,4 +1,4 @@
-# Peregrine Documentation Summary
+# 2025-07-09 Peregrine Documentation Summary
 
 ## Documentation Overview
 This knowledge base contains comprehensive documentation for the Peregrine project, a modern self-hosted image library application. The documentation is organized into interconnected topics covering all aspects of the project.
@@ -6,12 +6,12 @@ This knowledge base contains comprehensive documentation for the Peregrine proje
 ## Available Documentation
 
 ### Core Documentation
-- **[[Peregrine Project Overview]]** - Purpose, features, and key highlights
-- **[[Peregrine Architecture]]** - System architecture, tech stack, and data flow
-- **[[Backend API Documentation]]** - Complete API reference and implementation details
-- **[[Frontend Components]]** - React components, utilities, and UI architecture
-- **[[Development Setup]]** - Local development environment and workflow
-- **[[Deployment Guide]]** - Production deployment with Docker and CI/CD
+- **[[2025-07-09 Peregrine Project Overview]]** - Purpose, features, and key highlights
+- **[[2025-07-09 Peregrine Architecture]]** - System architecture, tech stack, and data flow
+- **[[2025-07-09 Backend API Documentation]]** - Complete API reference and implementation details
+- **[[2025-07-09 Frontend Components]]** - React components, utilities, and UI architecture
+- **[[2025-07-09 Development Setup]]** - Local development environment and workflow
+- **[[2025-07-09 Deployment Guide]]** - Production deployment with Docker and CI/CD
 
 ## Key Project Insights
 

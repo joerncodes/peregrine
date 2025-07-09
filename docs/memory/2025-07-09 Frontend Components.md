@@ -1,4 +1,4 @@
-# Frontend Components
+# 2025-07-09 Frontend Components
 
 ## Overview
 The Peregrine frontend is built with React 19 and TypeScript, featuring a modern component-based architecture with responsive design and user-friendly interactions.
@@ -216,8 +216,8 @@ export type ActionButtonProps = {
 - **Virtual Scrolling**: For large image collections
 
 ## Related Topics
-- [[Peregrine Project Overview]]
-- [[Peregrine Architecture]]
-- [[Backend API Documentation]]
-- [[Development Setup]]
-- [[Deployment Guide]]
+- [[2025-07-09 Peregrine Project Overview]]
+- [[2025-07-09 Peregrine Architecture]]
+- [[2025-07-09 Backend API Documentation]]
+- [[2025-07-09 Development Setup]]
+- [[2025-07-09 Deployment Guide]]
